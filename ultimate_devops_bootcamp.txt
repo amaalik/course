@@ -1,0 +1,219 @@
+The Ultimate DevOps Bootcamp
+Package management CentOs
+##yum install ansible (for installing ansble)
+##yum repolist (to see list of repo available under the OS)
+##ls /etc/yum.repos.d (where the file are configured)
+##yum list ansible (this will show you list of installed ansible packages)
+##yum remove ansible (this is to remove ansible package)
+##yum --showduplicates list ansible
+
+Services
+##service httpd start or systemctl start httpd (this is to start apache web service)
+##systemctl stop | status | enable | disable httpd (stop-to stop it, status-to check the status, enable-to always make it running at run time, disable-to disable it at run time)
+how to configure your system as a service, so it can be startes automatically on boot time ((/usr/lib/system/system))
+ we will need to create a file under the /usr/lib/systemd/system
+i.e my_app.service inside the file we have, what will be in the exec start is the command you use to run the aplication
+	[unit]
+	Description=My python web application
+
+	[Service]
+	ExecStart=/usr/bin/python3 /opt/code/my_app/.py
+	ExecStartPre=/opt/code/configure_db.sh
+	ExecStartPost=/opt/code/email_status.sh
+	Restart=always
+
+	[Install]
+	WantedBy=multi-user.target
+
+then you run systemctl daemon-reload( this will let system knows that here is a new service) then start the service.
+
+
+NETWORKING
+
+##by default Linux does not route traffic from one interface to another even after routing has been configured, to make this possible you need to change the:
+	/proc/sys/net/ipv4/ip_forward
+	change the figure there to 1
+
+other commands
+	ip link: to list and modify interfaces
+	ip addr: to see ip addresses assigned to those interfaces
+	ip addr add 192.168.1.10/24 dev etho: used ot set ip address on the interface( but only valid after a restart)
+ /etc/network/interfaces
+	ip route or route: to check routes
+	ip route add 192.168.1.0/24 via 192.168.2.1 : to add a route
+
+
+
+DNS
+to map dns on Linux, edit the file in /etc/hosts (local host, name resolution)
+the ip of dns server configure on a Linux system is at the /etc/resolv.conf, and you can multiple of them
+	nameserver	10.20.10.10
+	nameserver	8.8.8.8
+	nameserver	4.2.2.2
+	search		mycompany.com prod.mycompany.com while you have 192.168.1.1 mapping to web.mycompany.com, with this is can web can mean both whats in the search value)
+
+even when you have dns server, you can still have a local dns name mapping in the /etc/hosts file, normally it looks for it in the /etc/hosts file before going through the dns server and this order is defined in the /etc/nsswitch.conf
+	hosts:			files dns			(local file first before dns server)
+
+
+JAVA
+Installing Java
+sudo curl https://download.java.net/java/GA/jdk20/bdc68b4b9cbc4ebcb30745c85038d91d/36/GPL/openjdk-20_linux-x64_bin.tar.gz --output /opt/openjdk-20_linux-x64_bin.tar.gz(use this to download the java file)
+tar -xvf openjdk-13.0.2_linux-x64_bin.tar.gz /opt/ (to extract the file to /opt directories)
+jdk-13.0.2/bin/java -version (to check the java version)
+export PATH=$PATH:/opt/jdk-20/bin/ (set path variables for the java to where the bins are)
+then type java, to verify you can invoke java
+
+
+BUILDING AND PACKAGING
+		THIS IS IF RUNNING ONE FILE
+##developing source code:
+	MyClass.java
+##compiling a java code:
+	javac MyClass.java
+##running a java code:
+	java MyClass
+
+But to package a java application, it uses more java file, and needs to be packaged into archives, i.e java archive JAR, or Web archive WAR, for web packages
+
+to package this file, use:
+jar cf MyApp.jar MyClass.class Service1.class Service2.class...(these are the java files to be packaged(THIS IS FOR JAR)     this will create a manifest in the META-INF/MANIFEST.MF
+
+to run you use:
+	java -jar MyApp.jar this is for a packaged application
+to generate a documentation:
+	Javadoc -d MyClass.java, this will do the documentation and place it in a doc directory
+
+so we use build tools to automate this task, tools like maven ANT and gradle
+
+
+		NODEJS APPLICATIONS
+##INSTALLING NODEJS
+sudo yum install nodejs 
+##CHECKING NODE VERSION
+node -v
+##TO RUN NODEJS APP
+node add.js
+
+NODEJS NPM
+##npm -v (to get the version of the cli)
+##npm search file (to search the packages that can be installed)
+##npm install file (use this to install any dependencies or packages), when you install a package, npm installs it in node_modules directory under your current working directory
+##package.json file contain meta data for that file
+##node -e "console.log(module.paths)" places node looks at to import packages
+## npm install file -g (for global installs)
+
+		PYTHON
+##yum install python2
+##yum install python36
+##python2 or python3 (this is to enter the python mode)
+## python2 -V or python3 -V (this is to check for the version, uppercase V)
+##python2 main.py (to run python programs)
+
+PIP PYTHON PACKAGE MANAGER
+##pip2 -V and pip3 -V (to check python versions)
+or just pip -V
+##pip install flask (this is to install flask package)
+## pip show flask( this is will show you the location where the package is installed)	pip show flask jinja2 markupsafe (to show multiples)
+## after installing, you import it into the code using: python -c "import sys; print(sys.path)"
+##from flash import Flask
+##pip install flask jinja2 markupsafe request .. this can be used t0 install many packages at once, or move all the package details into a file called requirements.txt, the run: pip install -r requirements.txt
+requirements.txt
+	Flask==0.10.1	
+	Jinja2==2.7.3
+	MarkupSafe==0.23
+
+these are the versions, if they are not written like this, it will always download the latest
+##pip install flask --upgrade (to update a package)
+##pip uninstall flask (to uninstall a package)
+
+
+			GIT
+##Installing GIT
+sudo apt install git-all
+go to the site and see how to install for diff OS
+git --version (to verify the installed version)
+##Installing git manual pages
+sudo apt install git-man
+TO USE:
+git help {init}
+
+INITIALIZE GIT REPO
+##git init 
+##git status
+so you will have a file that is untracked, at this point Git doesn't know what to do with it yet.
+to allow save it to your local git,
+you will need to add it and the commit it 
+##git add story1.txt (it will add it to the staging area)
+##git commit -m "Added first story"(this will save its new changes from the previous change)
+anytime you create a new file in your initialized directory (using git init), it goes to the working area, where the file is not been tracked yet
+Before you commit, git needs to know who the author is so, you need to set the username and the email of the author
+##git config user.name Sarah
+##git config user.email sarah@example.com
+then ## git commit -m "Added first story" a copy is saved to the local git in the .git directory
+when you modify it, the current file in the commit still remains there, while what you changed will be the file which will be in the modified state and yet to be committed
+## git restore file (if modification was an accident, or not needed, restore it using that command)
+## git add . (this will stage all the files in that directory)
+##git restore --staged (this will removed a staged file back to a working area)
+##git rm --cached notes.txt (this is to remove a tracked file so that it does not be part of git, using --cached will remove and save the file, while using --f will delete it)
+##echo notes.txt >> .gitignore (to completely make git ignore this file, send the file to the .gitignore directory)
+##git log (shows all the command you need to know about your gits
+
+
+
+
+			GIT BRANCH
+##git branch sarah (this will create a new branch sarah)
+##git checkout -b sarah (this will create a new branch with the name sarah and immidiately switch to it)
+##git branch (this will show you list of branches, and the one with * is the one you are currently working on)
+##git checkout sarah (this will switch to sarah branch)
+##git branch -d sarah (this will delete sarah branch)
+A HEAD is where you are right now in the git repository, when you switch branches, the head moves with you
+##git log --graph --decorate (to check history of a branch)
+
+			GIT BRANCH
+##git merge  feature/signup (this means that, this branch will be merged to the current branch you are within)
+ 
+
+			GIT REMOTE REPOSITORY
+##git remote add origin https://.../.../.git (this will add remote to local and use origin as the aliase, so anytime you want to type the full url, you just ue origin)
+##git remote -v (this will list all your remote git repo)
+##git push origin master (origin is the remote repo alias[name], and master is the current branch you are on, this will push from local repo to github)
+
+
+		CLONING REMOTE REPO
+##git clone [ssh link]
+while working in a team, you might not want them to push directly into the remote repo, ie Github,
+they will push into the owners branch first, and do the merge manually on the weg GUI to master, using pull request ##git push origin sarah
+##git fetch origin master (this will update local repo from the online repo) the do ##git merge origin/master
+or you can just do git pull origin master to update it, instead of using the two commands
+
+
+			JENKINS
+INSTALLING JENKINS
+Jenkins require java to function
+##sudo apt install openjdk-11-jdk
+Then use the Jenkins documentation to complete the installation
+			(for redhat)
+sudo yum install epel-release -y
+sudo yum install fontconfig java-17-openjdk -y
+sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo --no-check-certificate
+sudo rpm --import http://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+sudo yum install jenkins -y
+
+			JENKNS CLI
+to use Jenkins cli, just follow the documentation:
+1 download the Jenkins cli
+2 Generate API Tokens on the jenkind cli
+3 then on the cli use java -jar jenkins-cli.jar -s http://41.242.60.203:8080/ -auth admin:1199ce64ec57942c302bb399e47f54bffd
+4 then, java -jar jenkins-cli.jar -s http://41.242.60.203:8080/ -auth admin:1199ce64ec57942c302bb399e47f54bffd -webSocket list-jobs (this is list jobs for you)
+
+			OR
+1. copy the key in /home/mike/.ssh/jenkins_key.pub and paste it in he the Jenkins GUI under, People - mike - Configure - SSH Public Keys. and the save it
+2. then, curl -Lv http://localhost:8085/login 2>&1 | grep -i 'x-ssh-endpoint'  (this is to find out the port in use, you can also get this port from Manage Jenkins - Security - SSH Server)
+3. Then login with and also input the help command: ssh -i /home/mike/.ssh/jenkins_key -l mike -p 8022 jenkins-server help ((-i flag is used to point to mike's private SSH key. Remember, we have already added the public key in the Jenkins configuration.
+-l is the login user which in our example is mike
+-p is the port which we found out in the previous step to be 8022))
+
+		INSTALLING PLUGINS
+1. you can get this from https://plugins.jenkins.io/
